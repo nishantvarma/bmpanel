@@ -933,6 +933,7 @@ static void handle_button(int x, int y, int button)
 
 	/* second button iconize all windows, we want to see our desktop */
 	if (button == 3) {
+		return;
 		struct task *iter = P.tasks;
 		while (iter) {
 			if (iter->desktop == adesk || iter->desktop == -1) {
