@@ -1,0 +1,39 @@
+name Darkmini BMPanel Theme
+author nsf<no.smile.face@gmail.com>
+version_major 1
+
+placement top
+
+tile_img tile-normal.png
+separator_img dark.png
+
+width 100%
+
+# panel alignment: left center right
+alignment center
+
+#use_composite
+
+# order of elements here
+# 's' - desktop Switcher
+# 'b' - taskBar
+elements 			b
+
+tb_tile_idle_img tile-normal.png
+tb_tile_pressed_img tile-pressed.png
+
+tb_separator_img dark.png
+
+tb_default_icon_img default-icon.png
+
+tb_font DejaVuSans-8
+tb_text_color_idle FFFFFF
+tb_text_color_pressed FFFFFF
+tb_text_offset_x 5
+tb_text_align left
+
+tb_icon_offset_x 4
+tb_icon_offset_y 0
+tb_icon_w 16
+tb_icon_h 16
+
