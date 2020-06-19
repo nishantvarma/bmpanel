@@ -5,11 +5,11 @@
 #ifndef BMPANEL_RENDER_H
 #define BMPANEL_RENDER_H
 
-#include <X11/Xlib.h>
-#include <Imlib2.h>
-#include "common.h"
 #include "bmpanel.h"
+#include "common.h"
 #include "theme.h"
+#include <Imlib2.h>
+#include <X11/Xlib.h>
 
 void init_render(struct xinfo *X, struct panel *P);
 void shutdown_render();
