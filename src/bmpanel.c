@@ -985,7 +985,7 @@ static void initX() {
     /* open connection to X server */
     X.display = XOpenDisplay(0);
     if (!X.display)
-        LOG_ERROR("failed connect to X server");
+        LOG_ERROR("failed to connect to X server");
     XSetErrorHandler(X_error_handler);
     XSetIOErrorHandler(X_io_error_handler);
 
