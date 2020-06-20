@@ -376,8 +376,8 @@ static void setup_composite() {
     }
 
     if (XRenderQueryExtension(X.display, &eventb, &errorb) == False) {
-        LOG_WARNING(
-            "render extension isn't available on server, disabling composite");
+        LOG_WARNING("render extension isn't available on server, "
+                    "disabling composite");
         P.theme->use_composite = 0;
         return;
     }
@@ -557,10 +557,10 @@ static void free_desktops() {
 
 static void rebuild_desktops() {
     /*
-     * This function is not optimal. It frees all the desktops and create them
-     * again Anyway, if you change number of your desktops or desktop names in
-     * real time, you are probably using wrong software, or maybe you were born
-     * in wrong world.
+     * This function is not optimal. It frees all the desktops and create
+     * them again Anyway, if you change number of your desktops or desktop
+     * names in real time, you are probably using wrong software, or maybe
+     * you were born in wrong world.
      */
     free_desktops();
 
