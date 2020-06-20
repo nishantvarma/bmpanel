@@ -46,33 +46,34 @@ struct mwmhints {
     uint32_t status;
 };
 
-static char *atom_names[] = {"WM_STATE",
-                             "_NET_DESKTOP_NAMES",
-                             "_NET_WM_STATE",
-                             "_NET_ACTIVE_WINDOW",
-                             "_NET_WM_NAME",
-                             "_NET_WM_ICON_NAME",
-                             "_NET_WM_VISIBLE_ICON_NAME",
-                             "_NET_WORKAREA",
-                             "_NET_WM_ICON",
-                             "_NET_WM_VISIBLE_NAME",
-                             "_NET_WM_STATE_SKIP_TASKBAR",
-                             "_NET_WM_STATE_SHADED",
-                             "_NET_WM_STATE_HIDDEN",
-                             "_NET_WM_DESKTOP",
-                             "_NET_MOVERESIZE_WINDOW",
-                             "_NET_WM_WINDOW_TYPE",
-                             "_NET_WM_WINDOW_TYPE_DOCK",
-                             "_NET_WM_WINDOW_TYPE_DESKTOP",
-                             "_NET_WM_STRUT",
-                             "_NET_WM_STRUT_PARTIAL",
-                             "_NET_CLIENT_LIST",
-                             "_NET_NUMBER_OF_DESKTOPS",
-                             "_NET_CURRENT_DESKTOP",
-                             "_NET_SYSTEM_TRAY_OPCODE",
-                             "UTF8_STRING",
-                             "_MOTIF_WM_HINTS",
-                             "_XROOTPMAP_ID"};
+static char *atom_names[] = {
+    "WM_STATE",
+    "_NET_DESKTOP_NAMES",
+    "_NET_WM_STATE",
+    "_NET_ACTIVE_WINDOW",
+    "_NET_WM_NAME",
+    "_NET_WM_ICON_NAME",
+    "_NET_WM_VISIBLE_ICON_NAME",
+    "_NET_WORKAREA",
+    "_NET_WM_ICON",
+    "_NET_WM_VISIBLE_NAME",
+    "_NET_WM_STATE_SKIP_TASKBAR",
+    "_NET_WM_STATE_SHADED",
+    "_NET_WM_STATE_HIDDEN",
+    "_NET_WM_DESKTOP",
+    "_NET_MOVERESIZE_WINDOW",
+    "_NET_WM_WINDOW_TYPE",
+    "_NET_WM_WINDOW_TYPE_DOCK",
+    "_NET_WM_WINDOW_TYPE_DESKTOP",
+    "_NET_WM_STRUT",
+    "_NET_WM_STRUT_PARTIAL",
+    "_NET_CLIENT_LIST",
+    "_NET_NUMBER_OF_DESKTOPS",
+    "_NET_CURRENT_DESKTOP",
+    "_NET_SYSTEM_TRAY_OPCODE",
+    "UTF8_STRING",
+    "_MOTIF_WM_HINTS",
+    "_XROOTPMAP_ID"};
 
 #ifndef PREFIX
 #define PREFIX "/usr"
@@ -98,13 +99,15 @@ static const char *version = "bmpanel version " BMPANEL_VERSION;
 static const char *usage =
     "usage: bmpanel [--version] [--help] [--usage] [--list] THEME";
 
-static void cleanup();
+static void
+cleanup();
 
 /**************************************************************************
   X error handlers
 **************************************************************************/
 
-static int X_error_handler(Display *dpy, XErrorEvent *error) {
+static int
+X_error_handler(Display *dpy, XErrorEvent *error) {
     char buf[1024];
     if (error->error_code == BadWindow)
         return 0;
@@ -113,7 +116,8 @@ static int X_error_handler(Display *dpy, XErrorEvent *error) {
     return 0;
 }
 
-static int X_io_error_handler(Display *dpy) {
+static int
+X_io_error_handler(Display *dpy) {
     LOG_ERROR("fatal error, connection to X server lost? exiting...");
     return 0;
 }
@@ -122,7 +126,8 @@ static int X_io_error_handler(Display *dpy) {
   window properties
 **************************************************************************/
 
-static void *get_prop_data(Window win, Atom prop, Atom type, int *items) {
+static void *
+get_prop_data(Window win, Atom prop, Atom type, int *items) {
     Atom type_ret;
     int format_ret;
     unsigned long items_ret;
@@ -131,16 +136,27 @@ static void *get_prop_data(Window win, Atom prop, Atom type, int *items) {
 
     prop_data = 0;
 
-    XGetWindowProperty(X.display, win, prop, 0, 0x7fffffff, False, type,
-                       &type_ret, &format_ret, &items_ret, &after_ret,
-                       &prop_data);
+    XGetWindowProperty(
+        X.display,
+        win,
+        prop,
+        0,
+        0x7fffffff,
+        False,
+        type,
+        &type_ret,
+        &format_ret,
+        &items_ret,
+        &after_ret,
+        &prop_data);
     if (items)
         *items = items_ret;
 
     return prop_data;
 }
 
-static int get_prop_int(Window win, Atom at) {
+static int
+get_prop_int(Window win, Atom at) {
     int num = 0;
     long *data;
 
@@ -152,7 +168,8 @@ static int get_prop_int(Window win, Atom at) {
     return num;
 }
 
-static Window get_prop_window(Window win, Atom at) {
+static Window
+get_prop_window(Window win, Atom at) {
     Window num = 0;
     Window *data;
 
@@ -164,7 +181,8 @@ static Window get_prop_window(Window win, Atom at) {
     return num;
 }
 
-static Pixmap get_prop_pixmap(Window win, Atom at) {
+static Pixmap
+get_prop_pixmap(Window win, Atom at) {
     Pixmap num = 0;
     Pixmap *data;
 
@@ -176,16 +194,19 @@ static Pixmap get_prop_pixmap(Window win, Atom at) {
     return num;
 }
 
-static int get_window_desktop(Window win) {
+static int
+get_window_desktop(Window win) {
     return get_prop_int(win, X.atoms[XATOM_NET_WM_DESKTOP]);
 }
 
-static int is_window_hidden(Window win) {
+static int
+is_window_hidden(Window win) {
     Atom *data;
     int ret = 0;
     int num;
 
-    data = get_prop_data(win, X.atoms[XATOM_NET_WM_WINDOW_TYPE], XA_ATOM, &num);
+    data =
+        get_prop_data(win, X.atoms[XATOM_NET_WM_WINDOW_TYPE], XA_ATOM, &num);
     if (data) {
         if (*data == X.atoms[XATOM_NET_WM_WINDOW_TYPE_DOCK] ||
             *data == X.atoms[XATOM_NET_WM_WINDOW_TYPE_DESKTOP]) {
@@ -209,12 +230,13 @@ static int is_window_hidden(Window win) {
     return ret;
 }
 
-static int is_window_iconified(Window win) {
+static int
+is_window_iconified(Window win) {
     long *data;
     int ret = 0;
 
-    data =
-        get_prop_data(win, X.atoms[XATOM_WM_STATE], X.atoms[XATOM_WM_STATE], 0);
+    data = get_prop_data(
+        win, X.atoms[XATOM_WM_STATE], X.atoms[XATOM_WM_STATE], 0);
     if (data) {
         if (data[0] == IconicState) {
             ret = 1;
@@ -236,7 +258,8 @@ static int is_window_iconified(Window win) {
     return ret;
 }
 
-static Imlib_Image get_window_icon(Window win) {
+static Imlib_Image
+get_window_icon(Window win) {
     if (!THEME_USE_TASKBAR_ICON(P.theme))
         return 0;
 
@@ -269,12 +292,20 @@ static Imlib_Image get_window_icon(Window win) {
                 Pixmap pix;
                 int x = 0, y = 0;
                 uint w = 0, h = 0, d = 0, bw = 0;
-                XGetGeometry(X.display, hints->icon_pixmap, &pix, &x, &y, &w,
-                             &h, &bw, &d);
+                XGetGeometry(
+                    X.display,
+                    hints->icon_pixmap,
+                    &pix,
+                    &x,
+                    &y,
+                    &w,
+                    &h,
+                    &bw,
+                    &d);
 
                 imlib_context_set_drawable(hints->icon_pixmap);
-                ret = imlib_create_image_from_drawable(hints->icon_mask, x, y,
-                                                       w, h, 1);
+                ret = imlib_create_image_from_drawable(
+                    hints->icon_mask, x, y, w, h, 1);
             }
             XFree(hints);
         }
@@ -300,25 +331,32 @@ static Imlib_Image get_window_icon(Window win) {
     return sizedicon;
 }
 
-static char *alloc_window_name(Window win) {
+static char *
+alloc_window_name(Window win) {
     char *ret, *name = 0;
-    name = get_prop_data(win, X.atoms[XATOM_NET_WM_VISIBLE_ICON_NAME],
-                         X.atoms[XATOM_UTF8_STRING], 0);
+    name = get_prop_data(
+        win,
+        X.atoms[XATOM_NET_WM_VISIBLE_ICON_NAME],
+        X.atoms[XATOM_UTF8_STRING],
+        0);
     if (name)
         goto name_here;
-    name = get_prop_data(win, X.atoms[XATOM_NET_WM_ICON_NAME],
-                         X.atoms[XATOM_UTF8_STRING], 0);
+    name = get_prop_data(
+        win, X.atoms[XATOM_NET_WM_ICON_NAME], X.atoms[XATOM_UTF8_STRING], 0);
     if (name)
         goto name_here;
     name = get_prop_data(win, XA_WM_ICON_NAME, XA_STRING, 0);
     if (name)
         goto name_here;
-    name = get_prop_data(win, X.atoms[XATOM_NET_WM_VISIBLE_NAME],
-                         X.atoms[XATOM_UTF8_STRING], 0);
+    name = get_prop_data(
+        win,
+        X.atoms[XATOM_NET_WM_VISIBLE_NAME],
+        X.atoms[XATOM_UTF8_STRING],
+        0);
     if (name)
         goto name_here;
-    name = get_prop_data(win, X.atoms[XATOM_NET_WM_NAME],
-                         X.atoms[XATOM_UTF8_STRING], 0);
+    name = get_prop_data(
+        win, X.atoms[XATOM_NET_WM_NAME], X.atoms[XATOM_UTF8_STRING], 0);
     if (name)
         goto name_here;
     name = get_prop_data(win, XA_WM_NAME, XA_STRING, 0);
@@ -337,7 +375,8 @@ name_here:
 **************************************************************************/
 
 #ifdef WITH_COMPOSITE
-static Visual *find_argb_visual() {
+static Visual *
+find_argb_visual() {
     XVisualInfo *xvi;
     XVisualInfo template;
     int nvi, i;
@@ -347,9 +386,11 @@ static Visual *find_argb_visual() {
     template.screen = X.screen;
     template.depth = 32;
     template.class = TrueColor;
-    xvi = XGetVisualInfo(X.display,
-                         VisualScreenMask | VisualDepthMask | VisualClassMask,
-                         &template, &nvi);
+    xvi = XGetVisualInfo(
+        X.display,
+        VisualScreenMask | VisualDepthMask | VisualClassMask,
+        &template,
+        &nvi);
     if (xvi == 0)
         return 0;
 
@@ -366,7 +407,8 @@ static Visual *find_argb_visual() {
     return visual;
 }
 
-static void setup_composite() {
+static void
+setup_composite() {
     int eventb, errorb;
     if (XCompositeQueryExtension(X.display, &eventb, &errorb) == False) {
         LOG_WARNING("composite extension isn't available on server, disabling "
@@ -399,8 +441,8 @@ static void setup_composite() {
 }
 #endif
 
-static Window create_panel_window(uint placement, int alignment, int h, int w,
-                                  int hover) {
+static Window
+create_panel_window(uint placement, int alignment, int h, int w, int hover) {
     Window win;
     if (!hover)
         hover = h;
@@ -427,15 +469,33 @@ static Window create_panel_window(uint placement, int alignment, int h, int w,
 
     P.x = x;
     P.y = y;
-    win = XCreateWindow(X.display, X.root, x, y, w, h, 0, X.depth, InputOutput,
-                        X.visual, X.amask, &X.attrs);
+    win = XCreateWindow(
+        X.display,
+        X.root,
+        x,
+        y,
+        w,
+        h,
+        0,
+        X.depth,
+        InputOutput,
+        X.visual,
+        X.amask,
+        &X.attrs);
 
-    XSelectInput(X.display, win,
-                 ButtonPressMask | ExposureMask | StructureNotifyMask);
+    XSelectInput(
+        X.display, win, ButtonPressMask | ExposureMask | StructureNotifyMask);
 
     /* get our place on desktop */
-    XChangeProperty(X.display, win, X.atoms[XATOM_NET_WM_STRUT], XA_CARDINAL,
-                    32, PropModeReplace, (uchar *)&strut, 4);
+    XChangeProperty(
+        X.display,
+        win,
+        X.atoms[XATOM_NET_WM_STRUT],
+        XA_CARDINAL,
+        32,
+        PropModeReplace,
+        (uchar *)&strut,
+        4);
 
     static const struct {
         int s, e;
@@ -449,18 +509,39 @@ static Window create_panel_window(uint placement, int alignment, int h, int w,
     };
     strutp[where[placement].s] = x;
     strutp[where[placement].e] = x + w;
-    XChangeProperty(X.display, win, X.atoms[XATOM_NET_WM_STRUT_PARTIAL],
-                    XA_CARDINAL, 32, PropModeReplace, (uchar *)&strutp, 12);
+    XChangeProperty(
+        X.display,
+        win,
+        X.atoms[XATOM_NET_WM_STRUT_PARTIAL],
+        XA_CARDINAL,
+        32,
+        PropModeReplace,
+        (uchar *)&strutp,
+        12);
 
     /* we want to be on all desktops */
     tmp = -1;
-    XChangeProperty(X.display, win, X.atoms[XATOM_NET_WM_DESKTOP], XA_CARDINAL,
-                    32, PropModeReplace, (uchar *)&tmp, 1);
+    XChangeProperty(
+        X.display,
+        win,
+        X.atoms[XATOM_NET_WM_DESKTOP],
+        XA_CARDINAL,
+        32,
+        PropModeReplace,
+        (uchar *)&tmp,
+        1);
 
     /* we're panel! */
     tmp = X.atoms[XATOM_NET_WM_WINDOW_TYPE_DOCK];
-    XChangeProperty(X.display, win, X.atoms[XATOM_NET_WM_WINDOW_TYPE], XA_ATOM,
-                    32, PropModeReplace, (uchar *)&tmp, 1);
+    XChangeProperty(
+        X.display,
+        win,
+        X.atoms[XATOM_NET_WM_WINDOW_TYPE],
+        XA_ATOM,
+        32,
+        PropModeReplace,
+        (uchar *)&tmp,
+        1);
 
     /* place window on it's position */
     XSizeHints size_hints;
@@ -484,9 +565,15 @@ static Window create_panel_window(uint placement, int alignment, int h, int w,
 
     /* set motif decoration hints */
     struct mwmhints mwm = {MWM_HINTS_DECORATIONS, 0, 0, 0, 0};
-    XChangeProperty(X.display, win, X.atoms[XATOM_MOTIF_WM_HINTS],
-                    X.atoms[XATOM_MOTIF_WM_HINTS], 32, PropModeReplace,
-                    (uchar *)&mwm, sizeof(struct mwmhints) / 4);
+    XChangeProperty(
+        X.display,
+        win,
+        X.atoms[XATOM_MOTIF_WM_HINTS],
+        X.atoms[XATOM_MOTIF_WM_HINTS],
+        32,
+        PropModeReplace,
+        (uchar *)&mwm,
+        sizeof(struct mwmhints) / 4);
 
     /* set classhint */
     XClassHint *ch;
@@ -513,9 +600,12 @@ static Window create_panel_window(uint placement, int alignment, int h, int w,
         cli.data.l[3] = 0;
         cli.data.l[4] = 0;
 
-        XSendEvent(X.display, X.root, False,
-                   SubstructureNotifyMask | SubstructureRedirectMask,
-                   (XEvent *)&cli);
+        XSendEvent(
+            X.display,
+            X.root,
+            False,
+            SubstructureNotifyMask | SubstructureRedirectMask,
+            (XEvent *)&cli);
     }
 
     return win;
@@ -525,11 +615,13 @@ static Window create_panel_window(uint placement, int alignment, int h, int w,
   desktop management
 **************************************************************************/
 
-static int get_active_desktop() {
+static int
+get_active_desktop() {
     return get_prop_int(X.root, X.atoms[XATOM_NET_CURRENT_DESKTOP]);
 }
 
-static void set_active_desktop(int d) {
+static void
+set_active_desktop(int d) {
     int i = 0;
     struct desktop *iter = P.desktops;
     while (iter) {
@@ -539,11 +631,13 @@ static void set_active_desktop(int d) {
     }
 }
 
-static int get_number_of_desktops() {
+static int
+get_number_of_desktops() {
     return get_prop_int(X.root, X.atoms[XATOM_NET_NUMBER_OF_DESKTOPS]);
 }
 
-static void free_desktops() {
+static void
+free_desktops() {
     struct desktop *iter, *next;
     iter = P.desktops;
     while (iter) {
@@ -555,7 +649,8 @@ static void free_desktops() {
     P.desktops = 0;
 }
 
-static void rebuild_desktops() {
+static void
+rebuild_desktops() {
     /*
      * This function is not optimal. It frees all the desktops and create
      * them again Anyway, if you change number of your desktops or desktop
@@ -570,8 +665,11 @@ static void rebuild_desktops() {
     int i, len;
 
     char *name, *names;
-    names = name = get_prop_data(X.root, X.atoms[XATOM_NET_DESKTOP_NAMES],
-                                 X.atoms[XATOM_UTF8_STRING], 0);
+    names = name = get_prop_data(
+        X.root,
+        X.atoms[XATOM_NET_DESKTOP_NAMES],
+        X.atoms[XATOM_UTF8_STRING],
+        0);
 
     for (i = 0; i < desktopsnum; ++i) {
         d = XMALLOCZ(struct desktop, 1);
@@ -601,7 +699,8 @@ static void rebuild_desktops() {
         XFree(names);
 }
 
-static void switch_desktop(int d) {
+static void
+switch_desktop(int d) {
     XClientMessageEvent e;
 
     if (d >= get_number_of_desktops())
@@ -617,15 +716,20 @@ static void switch_desktop(int d) {
     e.data.l[3] = 0;
     e.data.l[4] = 0;
 
-    XSendEvent(X.display, X.root, False,
-               SubstructureNotifyMask | SubstructureRedirectMask, (XEvent *)&e);
+    XSendEvent(
+        X.display,
+        X.root,
+        False,
+        SubstructureNotifyMask | SubstructureRedirectMask,
+        (XEvent *)&e);
 }
 
 /**************************************************************************
   task management
 **************************************************************************/
 
-static void activate_task(struct task *t) {
+static void
+activate_task(struct task *t) {
     XClientMessageEvent e;
 
     e.type = ClientMessage;
@@ -638,11 +742,16 @@ static void activate_task(struct task *t) {
     e.data.l[3] = 0;
     e.data.l[4] = 0;
 
-    XSendEvent(X.display, X.root, False,
-               SubstructureNotifyMask | SubstructureRedirectMask, (XEvent *)&e);
+    XSendEvent(
+        X.display,
+        X.root,
+        False,
+        SubstructureNotifyMask | SubstructureRedirectMask,
+        (XEvent *)&e);
 }
 
-static void free_tasks() {
+static void
+free_tasks() {
     struct task *iter, *next;
     iter = P.tasks;
     while (iter) {
@@ -657,7 +766,8 @@ static void free_tasks() {
     }
 }
 
-static void add_task(Window win, uint focused) {
+static void
+add_task(Window win, uint focused) {
     if (is_window_hidden(win))
         return;
 
@@ -669,8 +779,10 @@ static void add_task(Window win, uint focused) {
     t->focused = focused;
     t->icon = get_window_icon(win);
 
-    XSelectInput(X.display, win,
-                 PropertyChangeMask | FocusChangeMask | StructureNotifyMask);
+    XSelectInput(
+        X.display,
+        win,
+        PropertyChangeMask | FocusChangeMask | StructureNotifyMask);
 
     /* put task in list */
     struct task *iter = P.tasks;
@@ -690,7 +802,8 @@ static void add_task(Window win, uint focused) {
     }
 }
 
-static void sort_move_task(struct task *rt) {
+static void
+sort_move_task(struct task *rt) {
     struct task *prev = 0, *next, *iter, *t = P.tasks;
     while (t) {
         next = t->next;
@@ -722,12 +835,14 @@ static void sort_move_task(struct task *rt) {
     }
 }
 
-static void del_task(Window win) {
+static void
+del_task(Window win) {
     struct task *prev = 0, *next, *iter = P.tasks;
     while (iter) {
         next = iter->next;
         if (iter->win == win) {
-            if (iter->icon && iter->icon != P.theme->taskbar.default_icon_img) {
+            if (iter->icon &&
+                iter->icon != P.theme->taskbar.default_icon_img) {
                 imlib_context_set_image(iter->icon);
                 imlib_free_image();
             }
@@ -744,7 +859,8 @@ static void del_task(Window win) {
     }
 }
 
-static struct task *find_task(Window win) {
+static struct task *
+find_task(Window win) {
     struct task *iter = P.tasks;
     while (iter) {
         if (iter->win == win)
@@ -754,7 +870,8 @@ static struct task *find_task(Window win) {
     return 0;
 }
 
-static void update_tasks_focus(Window win) {
+static void
+update_tasks_focus(Window win) {
     struct task *iter = P.tasks;
     while (iter) {
         iter->focused = (iter->win == win);
@@ -762,7 +879,8 @@ static void update_tasks_focus(Window win) {
     }
 }
 
-static void update_tasks() {
+static void
+update_tasks() {
     Window *wins, focuswin;
     int num, i, j, rev;
 
@@ -810,7 +928,8 @@ static void update_tasks() {
   X message handlers
 **************************************************************************/
 
-static void handle_property_notify(Window win, Atom a) {
+static void
+handle_property_notify(Window win, Atom a) {
     /* global changes */
     if (win == X.root) {
         /* user or WM reconfigured it's desktops */
@@ -886,8 +1005,9 @@ static void handle_property_notify(Window win, Atom a) {
             return;
         }
         t->iconified = is_window_iconified(t->win);
-        t->focused = (get_prop_window(
-                          X.root, X.atoms[XATOM_NET_ACTIVE_WINDOW]) == t->win);
+        t->focused =
+            (get_prop_window(X.root, X.atoms[XATOM_NET_ACTIVE_WINDOW]) ==
+             t->win);
 
         commence_taskbar_redraw = 1;
         return;
@@ -904,7 +1024,8 @@ static void handle_property_notify(Window win, Atom a) {
     }
 }
 
-static void handle_button(int x, int y, int button) {
+static void
+handle_button(int x, int y, int button) {
     int adesk = get_active_desktop();
 
     /* second button iconize all windows, we want to see our desktop */
@@ -941,8 +1062,8 @@ static void handle_button(int x, int y, int button) {
     /* check taskbar */
     struct task *iter = P.tasks;
     while (iter) {
-        if ((iter->desktop == adesk || iter->desktop == -1) && x > iter->posx &&
-            x < iter->posx + iter->width) {
+        if ((iter->desktop == adesk || iter->desktop == -1) &&
+            x > iter->posx && x < iter->posx + iter->width) {
             if (iter->iconified) {
                 iter->iconified = 0;
                 iter->focused = 1;
@@ -969,7 +1090,8 @@ static void handle_button(int x, int y, int button) {
     }
 }
 
-static void handle_focusin(Window win) {
+static void
+handle_focusin(Window win) {
     struct task *iter = P.tasks;
     while (iter) {
         iter->focused = (iter->win == win);
@@ -981,7 +1103,8 @@ static void handle_focusin(Window win) {
   initialization
 **************************************************************************/
 
-static void initX() {
+static void
+initX() {
     /* open connection to X server */
     X.display = XOpenDisplay(0);
     if (!X.display)
@@ -1023,11 +1146,17 @@ static void initX() {
     }
 }
 
-static void initP(const char *theme) {
+static void
+initP(const char *theme) {
     char dirbuf[4096];
     /* first try to find theme in user home dir */
-    snprintf(dirbuf, sizeof(dirbuf), "%s%s/%s", getenv("HOME"), HOME_THEME_PATH,
-             theme);
+    snprintf(
+        dirbuf,
+        sizeof(dirbuf),
+        "%s%s/%s",
+        getenv("HOME"),
+        HOME_THEME_PATH,
+        theme);
     P.theme = load_theme(dirbuf);
     if (P.theme)
         goto validation;
@@ -1060,14 +1189,17 @@ validation:
         P.width = (P.theme->width_type == WIDTH_TYPE_PERCENT)
                       ? (int)((X.wa_w * P.theme->width) / 100)
                       : P.theme->width;
-    P.win =
-        create_panel_window(P.theme->placement, P.theme->alignment,
-                            P.theme->height, P.width, P.theme->height_override);
+    P.win = create_panel_window(
+        P.theme->placement,
+        P.theme->alignment,
+        P.theme->height,
+        P.width,
+        P.theme->height_override);
 
 #ifdef WITH_COMPOSITE
     if (P.theme->use_composite)
-        XCompositeRedirectSubwindows(X.display, P.win,
-                                     CompositeRedirectAutomatic);
+        XCompositeRedirectSubwindows(
+            X.display, P.win, CompositeRedirectAutomatic);
 
     if (P.theme->use_composite && is_element_in_theme(P.theme, 't')) {
         LOG_WARNING("tray cannot be used with composite mode enabled");
@@ -1080,7 +1212,8 @@ validation:
   cleanup
 **************************************************************************/
 
-static void freeP() {
+static void
+freeP() {
     free_theme(P.theme);
     free_tasks();
     free_desktops();
@@ -1088,7 +1221,8 @@ static void freeP() {
     XCloseDisplay(X.display);
 }
 
-static void cleanup() {
+static void
+cleanup() {
     shutdown_render();
     freeP();
     /* close(timerfd); */
@@ -1099,7 +1233,8 @@ static void cleanup() {
   event callbacks
 **************************************************************************/
 
-static void xconnection_cb() {
+static void
+xconnection_cb() {
     XEvent e;
     while (XPending(X.display)) {
         XNextEvent(X.display, &e);
@@ -1144,14 +1279,16 @@ static void xconnection_cb() {
   signal handlers
 **************************************************************************/
 
-static void sighup_handler(int xxx) {
+static void
+sighup_handler(int xxx) {
     LOG_MESSAGE("sighup signal received");
     cleanup();
     xmemleaks();
     exit(0);
 }
 
-static void sigint_handler(int xxx) {
+static void
+sigint_handler(int xxx) {
     LOG_MESSAGE("sigint signal received");
     cleanup();
     xmemleaks();
@@ -1162,7 +1299,8 @@ static void sigint_handler(int xxx) {
   list themes
 **************************************************************************/
 
-static void list_themes_in_dir(DIR *d) {
+static void
+list_themes_in_dir(DIR *d) {
     struct dirent *de;
     int len;
 
@@ -1182,7 +1320,8 @@ static void list_themes_in_dir(DIR *d) {
     }
 }
 
-static void list_themes() {
+static void
+list_themes() {
     char dirbuf[4096];
     DIR *d;
 
@@ -1210,11 +1349,13 @@ static void list_themes() {
 
 #if defined(WITH_EV)
 /* ---------- libev implementation ---------- */
-static void xconnection_cb_ev(EV_P_ struct ev_io *w, int revents) {
+static void
+xconnection_cb_ev(EV_P_ struct ev_io *w, int revents) {
     xconnection_cb();
 }
 
-static void init_and_start_loop() {
+static void
+init_and_start_loop() {
     int xfd = ConnectionNumber(X.display);
     struct ev_loop *el = ev_default_loop(0);
     ev_timer clock_redraw;
@@ -1235,14 +1376,16 @@ static void init_and_start_loop() {
 }
 #elif defined(WITH_EVENT)
 /* ---------- libevent implementation ---------- */
-static void xconnection_cb_event(int fd, short type, void *arg) {
+static void
+xconnection_cb_event(int fd, short type, void *arg) {
     xconnection_cb();
 
     /* reschedule */
     event_add((struct event *)arg, 0);
 }
 
-static void init_and_start_loop() {
+static void
+init_and_start_loop() {
     int xfd = ConnectionNumber(X.display);
     struct event clock_redraw;
     struct event xconnection;
@@ -1258,7 +1401,8 @@ static void init_and_start_loop() {
 }
 #else
 /* ---------- glibc 2.8 + timerfd in linux kernel ---------- */
-static void init_and_start_loop() {
+static void
+init_and_start_loop() {
     fd_set events;
     int maxfd;
     int xfd;
@@ -1298,7 +1442,8 @@ static void init_and_start_loop() {
 }
 #endif
 
-static void parse_args(int argc, char **argv) {
+static void
+parse_args(int argc, char **argv) {
     int i;
 
     for (i = 1; i < argc; i++) {
@@ -1328,7 +1473,8 @@ static void parse_args(int argc, char **argv) {
     }
 }
 
-int main(int argc, char **argv) {
+int
+main(int argc, char **argv) {
     log_attach_callback(log_console_callback);
     parse_args(argc, argv);
     LOG_MESSAGE("starting bmpanel with theme: %s", theme);

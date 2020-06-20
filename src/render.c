@@ -54,23 +54,26 @@ static int taskbar_width = 0;
   misc helpers
 **************************************************************************/
 
-static int get_image_width(Imlib_Image img) {
+static int
+get_image_width(Imlib_Image img) {
     if (!img)
         return 0;
     imlib_context_set_image(img);
     return imlib_image_get_width();
 }
 
-static void draw_image(Imlib_Image img, int ox) {
+static void
+draw_image(Imlib_Image img, int ox) {
     if (!img)
         return;
     int curw = get_image_width(img);
     imlib_context_set_image(bb);
-    imlib_blend_image_onto_image(img, 1, 0, 0, curw, theme->height, ox, 0, curw,
-                                 theme->height);
+    imlib_blend_image_onto_image(
+        img, 1, 0, 0, curw, theme->height, ox, 0, curw, theme->height);
 }
 
-static void tile_image(Imlib_Image img, int ox, int width) {
+static void
+tile_image(Imlib_Image img, int ox, int width) {
     int curw = get_image_width(img);
     imlib_context_set_image(bb);
 
@@ -79,14 +82,15 @@ static void tile_image(Imlib_Image img, int ox, int width) {
         if (width < 0)
             curw += width;
 
-        imlib_blend_image_onto_image(img, 1, 0, 0, curw, theme->height, ox, 0,
-                                     curw, theme->height);
+        imlib_blend_image_onto_image(
+            img, 1, 0, 0, curw, theme->height, ox, 0, curw, theme->height);
         ox += curw;
     }
 }
 
-static void draw_tile_sequence(Imlib_Image left, Imlib_Image tile,
-                               Imlib_Image right, int ox, int width) {
+static void
+draw_tile_sequence(
+    Imlib_Image left, Imlib_Image tile, Imlib_Image right, int ox, int width) {
     int lw = get_image_width(left);
     int rw = get_image_width(right);
     int tilew = width - lw - rw;
@@ -100,41 +104,61 @@ static void draw_tile_sequence(Imlib_Image left, Imlib_Image tile,
     draw_image(right, ox);
 }
 
-static void draw_switcher_alone(uint state, int ox, int width) {
-    draw_tile_sequence(theme->switcher.left_corner_img[state],
-                       theme->switcher.tile_img[state],
-                       theme->switcher.right_corner_img[state], ox, width);
+static void
+draw_switcher_alone(uint state, int ox, int width) {
+    draw_tile_sequence(
+        theme->switcher.left_corner_img[state],
+        theme->switcher.tile_img[state],
+        theme->switcher.right_corner_img[state],
+        ox,
+        width);
 }
 
-static void draw_switcher_left_corner(uint state, int ox, int width) {
-    draw_tile_sequence(theme->switcher.left_corner_img[state],
-                       theme->switcher.tile_img[state],
-                       theme->switcher.right_img[state], ox, width);
+static void
+draw_switcher_left_corner(uint state, int ox, int width) {
+    draw_tile_sequence(
+        theme->switcher.left_corner_img[state],
+        theme->switcher.tile_img[state],
+        theme->switcher.right_img[state],
+        ox,
+        width);
 }
 
-static void draw_switcher_middle(uint state, int ox, int width) {
-    draw_tile_sequence(theme->switcher.left_img[state],
-                       theme->switcher.tile_img[state],
-                       theme->switcher.right_img[state], ox, width);
+static void
+draw_switcher_middle(uint state, int ox, int width) {
+    draw_tile_sequence(
+        theme->switcher.left_img[state],
+        theme->switcher.tile_img[state],
+        theme->switcher.right_img[state],
+        ox,
+        width);
 }
 
-static void draw_switcher_right_corner(uint state, int ox, int width) {
-    draw_tile_sequence(theme->switcher.left_img[state],
-                       theme->switcher.tile_img[state],
-                       theme->switcher.right_corner_img[state], ox, width);
+static void
+draw_switcher_right_corner(uint state, int ox, int width) {
+    draw_tile_sequence(
+        theme->switcher.left_img[state],
+        theme->switcher.tile_img[state],
+        theme->switcher.right_corner_img[state],
+        ox,
+        width);
 }
 
-static void draw_taskbar_button(uint state, int ox, int width) {
+static void
+draw_taskbar_button(uint state, int ox, int width) {
     ox += theme->taskbar.space_gap;
     width -= theme->taskbar.space_gap * 2;
-    draw_tile_sequence(theme->taskbar.left_img[state],
-                       theme->taskbar.tile_img[state],
-                       theme->taskbar.right_img[state], ox, width);
+    draw_tile_sequence(
+        theme->taskbar.left_img[state],
+        theme->taskbar.tile_img[state],
+        theme->taskbar.right_img[state],
+        ox,
+        width);
     ox += theme->taskbar.space_gap;
 }
 
-static void get_text_dimensions(Imlib_Font font, const char *text, int *w,
-                                int *h) {
+static void
+get_text_dimensions(Imlib_Font font, const char *text, int *w, int *h) {
     if (!font) {
         if (w)
             *w = 0;
@@ -147,8 +171,16 @@ static void get_text_dimensions(Imlib_Font font, const char *text, int *w,
     imlib_get_text_size(text, w, h);
 }
 
-static void draw_text(Imlib_Font font, uint align, int ox, int width, int offx,
-                      int offy, const char *text, struct color *c) {
+static void
+draw_text(
+    Imlib_Font font,
+    uint align,
+    int ox,
+    int width,
+    int offx,
+    int offy,
+    const char *text,
+    struct color *c) {
     if (!font)
         return;
 
@@ -187,7 +219,8 @@ static void draw_text(Imlib_Font font, uint align, int ox, int width, int offx,
   desktop switcher functions
 **************************************************************************/
 
-static int update_switcher_positions(int ox, struct desktop *desktops) {
+static int
+update_switcher_positions(int ox, struct desktop *desktops) {
     struct desktop *iter, *prev;
     switcher_pos = ox;
     switcher_width = 0;
@@ -228,11 +261,13 @@ static int update_switcher_positions(int ox, struct desktop *desktops) {
     return w;
 }
 
-static int get_switcher_width(struct desktop *desktops) {
+static int
+get_switcher_width(struct desktop *desktops) {
     return update_switcher_positions(0, desktops);
 }
 
-void render_switcher(struct desktop *desktops) {
+void
+render_switcher(struct desktop *desktops) {
     tile_image(theme->tile_img, switcher_pos, switcher_width);
     if (!desktops)
         return;
@@ -249,10 +284,15 @@ void render_switcher(struct desktop *desktops) {
     limgw = get_image_width(theme->switcher.left_corner_img[state]);
     rimgw = get_image_width(theme->switcher.right_img[state]);
     ox += limgw;
-    draw_text(theme->switcher.font, theme->switcher.text_align, ox,
-              iter->width - limgw - rimgw, theme->switcher.text_offset_x,
-              theme->switcher.text_offset_y, iter->name,
-              &theme->switcher.text_color[state]);
+    draw_text(
+        theme->switcher.font,
+        theme->switcher.text_align,
+        ox,
+        iter->width - limgw - rimgw,
+        theme->switcher.text_offset_x,
+        theme->switcher.text_offset_y,
+        iter->name,
+        &theme->switcher.text_color[state]);
     ox += iter->width - limgw;
 
     if (!iter->next)
@@ -268,10 +308,15 @@ void render_switcher(struct desktop *desktops) {
     while (iter->next) {
         draw_switcher_middle(state, ox, iter->width);
         ox += limgw;
-        draw_text(theme->switcher.font, theme->switcher.text_align, ox,
-                  iter->width - limgw - rimgw, theme->switcher.text_offset_x,
-                  theme->switcher.text_offset_y, iter->name,
-                  &theme->switcher.text_color[state]);
+        draw_text(
+            theme->switcher.font,
+            theme->switcher.text_align,
+            ox,
+            iter->width - limgw - rimgw,
+            theme->switcher.text_offset_x,
+            theme->switcher.text_offset_y,
+            iter->name,
+            &theme->switcher.text_color[state]);
         ox += iter->width - limgw;
         iter = iter->next;
         state = iter->focused ? BSTATE_PRESSED : BSTATE_IDLE;
@@ -284,18 +329,24 @@ void render_switcher(struct desktop *desktops) {
     rimgw = get_image_width(theme->switcher.right_corner_img[state]);
     draw_switcher_right_corner(state, ox, iter->width);
     ox += limgw;
-    draw_text(theme->switcher.font, theme->switcher.text_align, ox,
-              iter->width - limgw - rimgw, theme->switcher.text_offset_x,
-              theme->switcher.text_offset_y, iter->name,
-              &theme->switcher.text_color[state]);
+    draw_text(
+        theme->switcher.font,
+        theme->switcher.text_align,
+        ox,
+        iter->width - limgw - rimgw,
+        theme->switcher.text_offset_x,
+        theme->switcher.text_offset_y,
+        iter->name,
+        &theme->switcher.text_color[state]);
 }
 
 /**************************************************************************
   taskbar functions
 **************************************************************************/
 
-static int update_taskbar_positions(int ox, int width, struct task *tasks,
-                                    struct desktop *desktops) {
+static int
+update_taskbar_positions(
+    int ox, int width, struct task *tasks, struct desktop *desktops) {
     taskbar_pos = ox;
     taskbar_width = width;
 
@@ -348,7 +399,8 @@ static int update_taskbar_positions(int ox, int width, struct task *tasks,
     return width;
 }
 
-void render_taskbar(struct task *tasks, struct desktop *desktops) {
+void
+render_taskbar(struct task *tasks, struct desktop *desktops) {
     tile_image(theme->tile_img, taskbar_pos, taskbar_width);
     int activedesktop = 0;
     struct desktop *iter = desktops;
@@ -385,9 +437,17 @@ void render_taskbar(struct task *tasks, struct desktop *desktops) {
                 w -= theme->taskbar.icon_offset_x;
                 imlib_context_set_image(bb);
                 imlib_context_set_blend(1);
-                imlib_blend_image_onto_image(t->icon, 1, 0, 0, srcw, srch, x, y,
-                                             theme->taskbar.icon_w,
-                                             theme->taskbar.icon_h);
+                imlib_blend_image_onto_image(
+                    t->icon,
+                    1,
+                    0,
+                    0,
+                    srcw,
+                    srch,
+                    x,
+                    y,
+                    theme->taskbar.icon_w,
+                    theme->taskbar.icon_h);
                 imlib_context_set_blend(0);
                 x += theme->taskbar.icon_w;
                 w -= theme->taskbar.icon_w;
@@ -395,10 +455,15 @@ void render_taskbar(struct task *tasks, struct desktop *desktops) {
 
             /* draw text */
             imlib_context_set_cliprect(x, 0, w, bbheight);
-            draw_text(theme->taskbar.font, theme->taskbar.text_align, x, w,
-                      theme->taskbar.text_offset_x,
-                      theme->taskbar.text_offset_y, t->name,
-                      &theme->taskbar.text_color[state]);
+            draw_text(
+                theme->taskbar.font,
+                theme->taskbar.text_align,
+                x,
+                w,
+                theme->taskbar.text_offset_x,
+                theme->taskbar.text_offset_y,
+                t->name,
+                &theme->taskbar.text_color[state]);
             imlib_context_set_cliprect(0, 0, bbwidth, bbheight);
 
             /* draw separator if exists */
@@ -413,8 +478,8 @@ void render_taskbar(struct task *tasks, struct desktop *desktops) {
   general render stuff
 **************************************************************************/
 
-static void tile_image_blend(Imlib_Image dst, Imlib_Image img, int ox,
-                             int width) {
+static void
+tile_image_blend(Imlib_Image dst, Imlib_Image img, int ox, int width) {
     int curw = get_image_width(img);
     imlib_context_set_blend(1);
     imlib_context_set_image(dst);
@@ -424,14 +489,15 @@ static void tile_image_blend(Imlib_Image dst, Imlib_Image img, int ox,
         if (width < 0)
             curw += width;
 
-        imlib_blend_image_onto_image(img, 0, 0, 0, curw, theme->height, ox, 0,
-                                     curw, theme->height);
+        imlib_blend_image_onto_image(
+            img, 0, 0, 0, curw, theme->height, ox, 0, curw, theme->height);
         ox += curw;
     }
     imlib_context_set_blend(0);
 }
 
-static void update_bg() {
+static void
+update_bg() {
     if (currootpmap != *rootpmap && *rootpmap != 0) {
         currootpmap = *rootpmap;
         imlib_context_set_drawable(currootpmap);
@@ -439,8 +505,8 @@ static void update_bg() {
             imlib_context_set_image(bg);
             imlib_free_image();
         }
-        bg =
-            imlib_create_image_from_drawable(0, bbx, bby, bbwidth, bbheight, 1);
+        bg = imlib_create_image_from_drawable(
+            0, bbx, bby, bbwidth, bbheight, 1);
 
         Pixmap tile, mask;
         imlib_context_set_display(bbdpy);
@@ -457,7 +523,8 @@ static void update_bg() {
     }
 }
 
-static void set_bg() {
+static void
+set_bg() {
     Pixmap tile, mask;
     imlib_context_set_display(bbdpy);
     imlib_context_set_visual(bbvis);
@@ -469,7 +536,8 @@ static void set_bg() {
     imlib_free_pixmap_and_mask(tile);
 }
 
-void init_render(struct xinfo *X, struct panel *P) {
+void
+init_render(struct xinfo *X, struct panel *P) {
     bbwidth = P->width;
     bbheight = P->theme->height;
     bb = imlib_create_image(bbwidth, bbheight);
@@ -503,9 +571,12 @@ void init_render(struct xinfo *X, struct panel *P) {
 
         XRenderPictureAttributes pwin;
         pwin.subwindow_mode = IncludeInferiors;
-        rootpic = XRenderCreatePicture(bbdpy, bbwin,
-                                       XRenderFindVisualFormat(bbdpy, bbvis),
-                                       CPSubwindowMode, &pwin);
+        rootpic = XRenderCreatePicture(
+            bbdpy,
+            bbwin,
+            XRenderFindVisualFormat(bbdpy, bbvis),
+            CPSubwindowMode,
+            &pwin);
     } else
 #endif
         if (*rootpmap) {
@@ -518,7 +589,8 @@ void init_render(struct xinfo *X, struct panel *P) {
     imlib_context_set_operation(IMLIB_OP_COPY);
 }
 
-void shutdown_render() {
+void
+shutdown_render() {
     imlib_context_set_image(bb);
     imlib_free_image();
     imlib_context_set_image(bbcolor);
@@ -542,7 +614,8 @@ void shutdown_render() {
     }
 }
 
-void render_update_panel_positions(struct panel *p) {
+void
+render_update_panel_positions(struct panel *p) {
     char *e = theme->elements;
     int ox = 0;
     int taskbarx = 0;
@@ -580,8 +653,8 @@ void render_update_panel_positions(struct panel *p) {
         /* tray */
         /* taskbar */
         case 'b':
-            ox += update_taskbar_positions(taskbarx, taskbarw, p->tasks,
-                                           p->desktops);
+            ox += update_taskbar_positions(
+                taskbarx, taskbarw, p->tasks, p->desktops);
             break;
         }
         if (*++e && theme->separator_img) {
@@ -590,7 +663,8 @@ void render_update_panel_positions(struct panel *p) {
     }
 }
 
-void render_panel(struct panel *p) {
+void
+render_panel(struct panel *p) {
     int ox = 0;
     char *e = theme->elements;
     while (*e) {
@@ -612,19 +686,20 @@ void render_panel(struct panel *p) {
     render_present();
 }
 
-void render_present() {
+void
+render_present() {
     update_bg();
 #ifdef WITH_COMPOSITE
     if (theme->use_composite) {
         /*
          * Because XRender can't do directly SRCc * SRCa + DSTc * (1 - SRCa)
-         * blending, I must apply SRCa to my SRCc manually. To do this I'm using
-         * PictOpSrc with alpha channel in mask. So, I need to copy RGB data to
-         * one buffer (color) and Alpha to another buffer (mask), then use them
-         * in XRenderComposite.
+         * blending, I must apply SRCa to my SRCc manually. To do this I'm
+         * using PictOpSrc with alpha channel in mask. So, I need to copy RGB
+         * data to one buffer (color) and Alpha to another buffer (mask), then
+         * use them in XRenderComposite.
          *
-         * But I think in can be done on theme loading stage. Just apply SRCa to
-         * SRCc immediately. Optimization?
+         * But I think in can be done on theme loading stage. Just apply SRCa
+         * to SRCc immediately. Optimization?
          */
 
         /* copy color part to bbcolor */
@@ -632,8 +707,8 @@ void render_present() {
         imlib_image_set_has_alpha(1);
         imlib_context_set_color(0, 0, 0, 255);
         imlib_image_fill_rectangle(0, 0, bbwidth, bbheight);
-        imlib_blend_image_onto_image(bb, 0, 0, 0, bbwidth, bbheight, 0, 0,
-                                     bbwidth, bbheight);
+        imlib_blend_image_onto_image(
+            bb, 0, 0, 0, bbwidth, bbheight, 0, 0, bbwidth, bbheight);
         imlib_context_set_drawable(pixcolor);
         imlib_render_image_on_drawable(0, 0);
 
@@ -644,17 +719,29 @@ void render_present() {
         imlib_context_set_drawable(pixalpha);
         imlib_render_image_on_drawable(0, 0);
 
-        XRenderComposite(bbdpy, PictOpSrc, piccolor, picalpha, rootpic, 0, 0, 0,
-                         0, 0, 0, bbwidth, bbheight);
+        XRenderComposite(
+            bbdpy,
+            PictOpSrc,
+            piccolor,
+            picalpha,
+            rootpic,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            bbwidth,
+            bbheight);
     } else
 #endif
         if (*rootpmap) {
         imlib_context_set_image(bbcolor);
-        imlib_blend_image_onto_image(bg, 0, 0, 0, bbwidth, bbheight, 0, 0,
-                                     bbwidth, bbheight);
+        imlib_blend_image_onto_image(
+            bg, 0, 0, 0, bbwidth, bbheight, 0, 0, bbwidth, bbheight);
         imlib_context_set_blend(1);
-        imlib_blend_image_onto_image(bb, 0, 0, 0, bbwidth, bbheight, 0, 0,
-                                     bbwidth, bbheight);
+        imlib_blend_image_onto_image(
+            bb, 0, 0, 0, bbwidth, bbheight, 0, 0, bbwidth, bbheight);
         imlib_context_set_blend(0);
 
         imlib_context_set_drawable(bbwin);

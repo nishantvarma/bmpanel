@@ -25,15 +25,22 @@
 #define LOG_FILENAME "log-bmpanel.log"
 
 /* main log routines */
-void log_msg(int, const char *, ...);
-void log_attach_callback(void (*)(int, const char *));
-void log_clear_callbacks();
-void log_set_verbosity(int);
+void
+log_msg(int, const char *, ...);
+void
+log_attach_callback(void (*)(int, const char *));
+void
+log_clear_callbacks();
+void
+log_set_verbosity(int);
 
 /* built-in receivers */
-void log_console_callback(int, const char *);
-void log_console_color_callback(int, const char *);
-void log_file_callback(int, const char *);
+void
+log_console_callback(int, const char *);
+void
+log_console_color_callback(int, const char *);
+void
+log_file_callback(int, const char *);
 
 /* useful macros */
 #define LOG_MESSAGE(...) log_msg(LOG_LEVEL_MESSAGE, __VA_ARGS__)
@@ -43,10 +50,10 @@ void log_file_callback(int, const char *);
 #define LOG_DEBUG(...) log_msg(LOG_LEVEL_DEBUG, __VA_ARGS__)
 
 #ifdef LOG_ASSERT_ENABLED
-#define LOG_ASSERT(what)                                                       \
-    ((what) ? ((void)0)                                                        \
-            : LOG_WARNING("assertion failed: " #what " (%s:%d)", __FILE__,     \
-                          __LINE__))
+#define LOG_ASSERT(what)                                                      \
+    ((what) ? ((void)0)                                                       \
+            : LOG_WARNING(                                                    \
+                  "assertion failed: " #what " (%s:%d)", __FILE__, __LINE__))
 #else
 #define LOG_ASSERT(nothing) ((void)0)
 #endif

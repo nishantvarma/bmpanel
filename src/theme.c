@@ -10,22 +10,36 @@
 #include <string.h>
 #include <unistd.h>
 
-static void free_imlib_font(Imlib_Font font);
-static void free_imlib_image(Imlib_Image img);
-static uint figure_out_placement(const char *str);
-static uint figure_out_align(const char *str);
-static uint figure_out_width_type(const char *str);
-static int parse_key_value(const char *key, const char *value, struct theme *t);
-static int parse_line(char *line, struct theme *t);
-static void parse_color(struct color *c, const char *value);
-static uchar hex_to_dec(uchar c);
-static int load_and_parse_theme(struct theme *t);
+static void
+free_imlib_font(Imlib_Font font);
+static void
+free_imlib_image(Imlib_Image img);
+static uint
+figure_out_placement(const char *str);
+static uint
+figure_out_align(const char *str);
+static uint
+figure_out_width_type(const char *str);
+static int
+parse_key_value(const char *key, const char *value, struct theme *t);
+static int
+parse_line(char *line, struct theme *t);
+static void
+parse_color(struct color *c, const char *value);
+static uchar
+hex_to_dec(uchar c);
+static int
+load_and_parse_theme(struct theme *t);
 
-static Imlib_Font load_font(const char *pattern);
-static int init_fontcfg();
-static void shutdown_fontcfg();
+static Imlib_Font
+load_font(const char *pattern);
+static int
+init_fontcfg();
+static void
+shutdown_fontcfg();
 
-struct theme *load_theme(const char *dir) {
+struct theme *
+load_theme(const char *dir) {
     if (!init_fontcfg())
         return 0;
 
@@ -59,7 +73,8 @@ struct theme *load_theme(const char *dir) {
     return t;
 }
 
-void free_theme(struct theme *t) {
+void
+free_theme(struct theme *t) {
     if (t->name)
         xfree(t->name);
     if (t->author)
@@ -69,14 +84,14 @@ void free_theme(struct theme *t) {
     if (t->themedir)
         xfree(t->themedir);
 
-#define SAFE_FREE_IMG(img)                                                     \
-    if (img)                                                                   \
+#define SAFE_FREE_IMG(img)                                                    \
+    if (img)                                                                  \
     free_imlib_image(img)
-#define SAFE_FREE_IMG2(img)                                                    \
-    SAFE_FREE_IMG(img[0]);                                                     \
+#define SAFE_FREE_IMG2(img)                                                   \
+    SAFE_FREE_IMG(img[0]);                                                    \
     SAFE_FREE_IMG(img[1])
-#define SAFE_FREE_FONT(font)                                                   \
-    if (font)                                                                  \
+#define SAFE_FREE_FONT(font)                                                  \
+    if (font)                                                                 \
     free_imlib_font(font)
 
     /* general */
@@ -103,15 +118,17 @@ void free_theme(struct theme *t) {
     shutdown_fontcfg();
 }
 
-int theme_is_valid(struct theme *t) {
+int
+theme_is_valid(struct theme *t) {
     if (!t->elements) {
         LOG_WARNING("elements specification missing");
         return 0;
     }
 
     if (!is_element_in_theme(t, 'b')) {
-        LOG_WARNING("taskbar element missing, it is necessary to place taskbar "
-                    "somewhere");
+        LOG_WARNING(
+            "taskbar element missing, it is necessary to place taskbar "
+            "somewhere");
         return 0;
     }
 
@@ -134,19 +151,22 @@ int theme_is_valid(struct theme *t) {
 
         if (t->taskbar.icon_h != 0 && t->taskbar.icon_w != 0 &&
             !t->taskbar.default_icon_img) {
-            LOG_WARNING("taskbar icon size specified, but default taskbar icon "
-                        "image is missing");
+            LOG_WARNING(
+                "taskbar icon size specified, but default taskbar icon "
+                "image is missing");
             return 0;
         }
     }
     return 1;
 }
 
-int is_element_in_theme(struct theme *t, char e) {
+int
+is_element_in_theme(struct theme *t, char e) {
     return (strchr(t->elements, e) != 0);
 }
 
-void theme_remove_element(struct theme *t, char e) {
+void
+theme_remove_element(struct theme *t, char e) {
     char *p, *c;
     p = c = strchr(t->elements, e);
     if (!c)
@@ -162,12 +182,14 @@ void theme_remove_element(struct theme *t, char e) {
   free helpers
 **************************************************************************/
 
-static void free_imlib_font(Imlib_Font font) {
+static void
+free_imlib_font(Imlib_Font font) {
     imlib_context_set_font(font);
     imlib_free_font();
 }
 
-static void free_imlib_image(Imlib_Image img) {
+static void
+free_imlib_image(Imlib_Image img) {
     imlib_context_set_image(img);
     imlib_free_image();
 }
@@ -176,7 +198,8 @@ static void free_imlib_image(Imlib_Image img) {
   string to enum converters
 **************************************************************************/
 
-static uint figure_out_placement(const char *str) {
+static uint
+figure_out_placement(const char *str) {
     if (!strcmp("top", str)) {
         return PLACE_TOP;
     } else if (!strcmp("bottom", str)) {
@@ -185,7 +208,8 @@ static uint figure_out_placement(const char *str) {
     return 0;
 }
 
-static uint figure_out_align(const char *str) {
+static uint
+figure_out_align(const char *str) {
     if (!strcmp("left", str)) {
         return ALIGN_LEFT;
     } else if (!strcmp("center", str)) {
@@ -196,7 +220,8 @@ static uint figure_out_align(const char *str) {
     return 0;
 }
 
-static uint figure_out_width_type(const char *str) {
+static uint
+figure_out_width_type(const char *str) {
     /* If seeking by percent */
     return (strchr(str, '%') != 0 ? WIDTH_TYPE_PERCENT : WIDTH_TYPE_PIXELS);
 }
@@ -205,37 +230,37 @@ static uint figure_out_width_type(const char *str) {
   evil slow parser (TODO: rewrite with hash table?)
 **************************************************************************/
 
-static int parse_key_value(const char *key, const char *value,
-                           struct theme *t) {
+static int
+parse_key_value(const char *key, const char *value, struct theme *t) {
     char buf[4096];
 
 #define CMP(str) if (!strcmp(str, key))
 #define ECMP(str) else CMP(str)
-#define DODIR                                                                  \
-    if (value[0] == '/')                                                       \
-        snprintf(buf, sizeof(buf), "%s", value);                               \
-    else                                                                       \
+#define DODIR                                                                 \
+    if (value[0] == '/')                                                      \
+        snprintf(buf, sizeof(buf), "%s", value);                              \
+    else                                                                      \
         snprintf(buf, sizeof(buf), "%s/%s", t->themedir, value)
-#define SAFE_LOAD_IMAGE(img)                                                   \
-    DODIR;                                                                     \
-    img = imlib_load_image(buf);                                               \
-    if (!img)                                                                  \
-        do {                                                                   \
-            LOG_WARNING("failed to load image: %s", buf);                      \
-            return 0;                                                          \
+#define SAFE_LOAD_IMAGE(img)                                                  \
+    DODIR;                                                                    \
+    img = imlib_load_image(buf);                                              \
+    if (!img)                                                                 \
+        do {                                                                  \
+            LOG_WARNING("failed to load image: %s", buf);                     \
+            return 0;                                                         \
     } while (0)
-#define SAFE_LOAD_FONT(font)                                                   \
-    font = load_font(value);                                                   \
-    if (!font)                                                                 \
-        do {                                                                   \
-            LOG_WARNING("failed to load font: %s", value);                     \
-            return 0;                                                          \
+#define SAFE_LOAD_FONT(font)                                                  \
+    font = load_font(value);                                                  \
+    if (!font)                                                                \
+        do {                                                                  \
+            LOG_WARNING("failed to load font: %s", value);                    \
+            return 0;                                                         \
     } while (0)
-#define PARSE_INT(un)                                                          \
-    if (1 != sscanf(value, "%d", &un))                                         \
-        do {                                                                   \
-            LOG_WARNING("failed to parse integer: %s", value);                 \
-            return 0;                                                          \
+#define PARSE_INT(un)                                                         \
+    if (1 != sscanf(value, "%d", &un))                                        \
+        do {                                                                  \
+            LOG_WARNING("failed to parse integer: %s", value);                \
+            return 0;                                                         \
     } while (0)
 
     /* -------------------------- general ---------------------- */
@@ -349,7 +374,8 @@ static int parse_key_value(const char *key, const char *value,
     return 1;
 }
 
-static int parse_line(char *line, struct theme *t) {
+static int
+parse_line(char *line, struct theme *t) {
     /* TODO: error checks */
     int len = strlen(line);
     char *key, *value;
@@ -369,7 +395,8 @@ static int parse_line(char *line, struct theme *t) {
     return parse_key_value(key, value, t);
 }
 
-static int load_and_parse_theme(struct theme *t) {
+static int
+load_and_parse_theme(struct theme *t) {
     char buf[4096];
     snprintf(buf, sizeof(buf), "%s/theme", t->themedir);
 
@@ -395,7 +422,8 @@ static int load_and_parse_theme(struct theme *t) {
     return 1;
 }
 
-static uchar hex_to_dec(uchar c) {
+static uchar
+hex_to_dec(uchar c) {
     if (c >= '0' && c <= '9')
         return c - '0';
     if (c >= 'a' && c <= 'z')
@@ -405,7 +433,8 @@ static uchar hex_to_dec(uchar c) {
     return 15;
 }
 
-static void parse_color(struct color *c, const char *value) {
+static void
+parse_color(struct color *c, const char *value) {
     /* red */
     c->r = 16 * hex_to_dec(*value++);
     c->r += hex_to_dec(*value++);
@@ -421,7 +450,8 @@ static void parse_color(struct color *c, const char *value) {
   font config stuff
 **************************************************************************/
 
-static Imlib_Font load_font(const char *pattern) {
+static Imlib_Font
+load_font(const char *pattern) {
     char buf[512];
     FcPattern *pat;
     FcPattern *match;
@@ -447,7 +477,8 @@ static Imlib_Font load_font(const char *pattern) {
     FcChar8 *filename_tmp;
     char *filename;
     int size;
-    if (FcPatternGetString(match, FC_FILE, 0, &filename_tmp) != FcResultMatch) {
+    if (FcPatternGetString(match, FC_FILE, 0, &filename_tmp) !=
+        FcResultMatch) {
         LOG_WARNING("can't get font filename from match");
         FcPatternDestroy(match);
         return 0;
@@ -482,7 +513,8 @@ static Imlib_Font load_font(const char *pattern) {
     return imlib_load_font(buf);
 }
 
-static int init_fontcfg() {
+static int
+init_fontcfg() {
     if (!FcInit()) {
         LOG_WARNING("failed to initialize fontconfig");
         return 0;
@@ -490,4 +522,7 @@ static int init_fontcfg() {
     return 1;
 }
 
-static void shutdown_fontcfg() { FcFini(); }
+static void
+shutdown_fontcfg() {
+    FcFini();
+}

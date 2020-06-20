@@ -24,20 +24,28 @@ typedef unsigned long long ulonglong;
 **************************************************************************/
 
 #ifndef MEMDEBUG
-void *impl__xmalloc(size_t size);
-void *impl__xmallocz(size_t size);
-void impl__xfree(void *ptr);
-char *impl__xstrdup(const char *str);
+void *
+impl__xmalloc(size_t size);
+void *
+impl__xmallocz(size_t size);
+void
+impl__xfree(void *ptr);
+char *
+impl__xstrdup(const char *str);
 
 #define xmalloc(a) impl__xmalloc(a)
 #define xmallocz(a) impl__xmallocz(a)
 #define xfree(a) impl__xfree(a)
 #define xstrdup(a) impl__xstrdup(a)
 #else
-void *impl__xmalloc(size_t size, const char *file, uint line);
-void *impl__xmallocz(size_t size, const char *file, uint line);
-void impl__xfree(void *ptr, const char *file, uint line);
-char *impl__xstrdup(const char *str, const char *file, uint line);
+void *
+impl__xmalloc(size_t size, const char *file, uint line);
+void *
+impl__xmallocz(size_t size, const char *file, uint line);
+void
+impl__xfree(void *ptr, const char *file, uint line);
+char *
+impl__xstrdup(const char *str, const char *file, uint line);
 
 #define xmalloc(a) impl__xmalloc(a, __FILE__, __LINE__)
 #define xmallocz(a) impl__xmallocz(a, __FILE__, __LINE__)
@@ -45,7 +53,8 @@ char *impl__xstrdup(const char *str, const char *file, uint line);
 #define xstrdup(a) impl__xstrdup(a, __FILE__, __LINE__)
 #endif
 
-void xmemleaks();
+void
+xmemleaks();
 
 #define XMALLOC(type, n) xmalloc(sizeof(type) * (n))
 #define XMALLOCZ(type, n) xmallocz(sizeof(type) * (n))
