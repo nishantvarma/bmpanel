@@ -118,19 +118,14 @@ struct theme {
     char *themedir;
 };
 
-#define THEME_USE_TASKBAR_ICON(t)                                             \
-    (is_element_in_theme((t), 'b') && (t)->taskbar.icon_w != 0 &&             \
+#define THEME_USE_TASKBAR_ICON(t) \
+    (is_element_in_theme((t), 'b') && (t)->taskbar.icon_w != 0 && \
      (t)->taskbar.icon_h != 0)
 
-struct theme *
-load_theme(const char *dir);
-void
-free_theme(struct theme *t);
-int
-theme_is_valid(struct theme *t);
-int
-is_element_in_theme(struct theme *t, char e);
-void
-theme_remove_element(struct theme *t, char e);
+struct theme *load_theme(const char *dir);
+void free_theme(struct theme *t);
+int theme_is_valid(struct theme *t);
+int is_element_in_theme(struct theme *t, char e);
+void theme_remove_element(struct theme *t, char e);
 
 #endif

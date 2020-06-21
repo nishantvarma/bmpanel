@@ -99,8 +99,7 @@ static const char *version = "bmpanel version " BMPANEL_VERSION;
 static const char *usage =
     "usage: bmpanel [--version] [--help] [--usage] [--list] THEME";
 
-static void
-cleanup();
+static void cleanup();
 
 /**************************************************************************
   X error handlers

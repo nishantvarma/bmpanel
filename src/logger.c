@@ -20,8 +20,7 @@ static int log_callbacks_count = 0;
 static int log_verbosity = LOG_EVERYTHING;
 static int file_callback_initialized = 0;
 
-static void
-send_to_all(int level, const char *msg);
+static void send_to_all(int level, const char *msg);
 
 void
 log_msg(int level, const char *msg, ...) {

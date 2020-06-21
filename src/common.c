@@ -65,10 +65,8 @@ struct mem_entry {
 };
 
 static struct mem_entry *entries;
-static void
-add_mem_entry(void *ptr, size_t size, const char *file, uint line);
-static void
-del_mem_entry(void *ptr, const char *file, uint line);
+static void add_mem_entry(void *ptr, size_t size, const char *file, uint line);
+static void del_mem_entry(void *ptr, const char *file, uint line);
 
 void *
 impl__xmalloc(size_t size, const char *file, uint line) {

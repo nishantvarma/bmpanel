@@ -10,33 +10,21 @@
 #include <string.h>
 #include <unistd.h>
 
-static void
-free_imlib_font(Imlib_Font font);
-static void
-free_imlib_image(Imlib_Image img);
-static uint
-figure_out_placement(const char *str);
-static uint
-figure_out_align(const char *str);
-static uint
-figure_out_width_type(const char *str);
+static void free_imlib_font(Imlib_Font font);
+static void free_imlib_image(Imlib_Image img);
+static uint figure_out_placement(const char *str);
+static uint figure_out_align(const char *str);
+static uint figure_out_width_type(const char *str);
 static int
 parse_key_value(const char *key, const char *value, struct theme *t);
-static int
-parse_line(char *line, struct theme *t);
-static void
-parse_color(struct color *c, const char *value);
-static uchar
-hex_to_dec(uchar c);
-static int
-load_and_parse_theme(struct theme *t);
+static int parse_line(char *line, struct theme *t);
+static void parse_color(struct color *c, const char *value);
+static uchar hex_to_dec(uchar c);
+static int load_and_parse_theme(struct theme *t);
 
-static Imlib_Font
-load_font(const char *pattern);
-static int
-init_fontcfg();
-static void
-shutdown_fontcfg();
+static Imlib_Font load_font(const char *pattern);
+static int init_fontcfg();
+static void shutdown_fontcfg();
 
 struct theme *
 load_theme(const char *dir) {
@@ -84,14 +72,14 @@ free_theme(struct theme *t) {
     if (t->themedir)
         xfree(t->themedir);
 
-#define SAFE_FREE_IMG(img)                                                    \
-    if (img)                                                                  \
+#define SAFE_FREE_IMG(img) \
+    if (img) \
     free_imlib_image(img)
-#define SAFE_FREE_IMG2(img)                                                   \
-    SAFE_FREE_IMG(img[0]);                                                    \
+#define SAFE_FREE_IMG2(img) \
+    SAFE_FREE_IMG(img[0]); \
     SAFE_FREE_IMG(img[1])
-#define SAFE_FREE_FONT(font)                                                  \
-    if (font)                                                                 \
+#define SAFE_FREE_FONT(font) \
+    if (font) \
     free_imlib_font(font)
 
     /* general */
@@ -236,31 +224,31 @@ parse_key_value(const char *key, const char *value, struct theme *t) {
 
 #define CMP(str) if (!strcmp(str, key))
 #define ECMP(str) else CMP(str)
-#define DODIR                                                                 \
-    if (value[0] == '/')                                                      \
-        snprintf(buf, sizeof(buf), "%s", value);                              \
-    else                                                                      \
+#define DODIR \
+    if (value[0] == '/') \
+        snprintf(buf, sizeof(buf), "%s", value); \
+    else \
         snprintf(buf, sizeof(buf), "%s/%s", t->themedir, value)
-#define SAFE_LOAD_IMAGE(img)                                                  \
-    DODIR;                                                                    \
-    img = imlib_load_image(buf);                                              \
-    if (!img)                                                                 \
-        do {                                                                  \
-            LOG_WARNING("failed to load image: %s", buf);                     \
-            return 0;                                                         \
+#define SAFE_LOAD_IMAGE(img) \
+    DODIR; \
+    img = imlib_load_image(buf); \
+    if (!img) \
+        do { \
+            LOG_WARNING("failed to load image: %s", buf); \
+            return 0; \
     } while (0)
-#define SAFE_LOAD_FONT(font)                                                  \
-    font = load_font(value);                                                  \
-    if (!font)                                                                \
-        do {                                                                  \
-            LOG_WARNING("failed to load font: %s", value);                    \
-            return 0;                                                         \
+#define SAFE_LOAD_FONT(font) \
+    font = load_font(value); \
+    if (!font) \
+        do { \
+            LOG_WARNING("failed to load font: %s", value); \
+            return 0; \
     } while (0)
-#define PARSE_INT(un)                                                         \
-    if (1 != sscanf(value, "%d", &un))                                        \
-        do {                                                                  \
-            LOG_WARNING("failed to parse integer: %s", value);                \
-            return 0;                                                         \
+#define PARSE_INT(un) \
+    if (1 != sscanf(value, "%d", &un)) \
+        do { \
+            LOG_WARNING("failed to parse integer: %s", value); \
+            return 0; \
     } while (0)
 
     /* -------------------------- general ---------------------- */
