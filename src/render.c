@@ -109,39 +109,29 @@ draw_switcher_alone(uint state, int ox, int width) {
     draw_tile_sequence(
         theme->switcher.left_corner_img[state],
         theme->switcher.tile_img[state],
-        theme->switcher.right_corner_img[state],
-        ox,
-        width);
+        theme->switcher.right_corner_img[state], ox, width);
 }
 
 static void
 draw_switcher_left_corner(uint state, int ox, int width) {
     draw_tile_sequence(
         theme->switcher.left_corner_img[state],
-        theme->switcher.tile_img[state],
-        theme->switcher.right_img[state],
-        ox,
+        theme->switcher.tile_img[state], theme->switcher.right_img[state], ox,
         width);
 }
 
 static void
 draw_switcher_middle(uint state, int ox, int width) {
     draw_tile_sequence(
-        theme->switcher.left_img[state],
-        theme->switcher.tile_img[state],
-        theme->switcher.right_img[state],
-        ox,
-        width);
+        theme->switcher.left_img[state], theme->switcher.tile_img[state],
+        theme->switcher.right_img[state], ox, width);
 }
 
 static void
 draw_switcher_right_corner(uint state, int ox, int width) {
     draw_tile_sequence(
-        theme->switcher.left_img[state],
-        theme->switcher.tile_img[state],
-        theme->switcher.right_corner_img[state],
-        ox,
-        width);
+        theme->switcher.left_img[state], theme->switcher.tile_img[state],
+        theme->switcher.right_corner_img[state], ox, width);
 }
 
 static void
@@ -149,11 +139,8 @@ draw_taskbar_button(uint state, int ox, int width) {
     ox += theme->taskbar.space_gap;
     width -= theme->taskbar.space_gap * 2;
     draw_tile_sequence(
-        theme->taskbar.left_img[state],
-        theme->taskbar.tile_img[state],
-        theme->taskbar.right_img[state],
-        ox,
-        width);
+        theme->taskbar.left_img[state], theme->taskbar.tile_img[state],
+        theme->taskbar.right_img[state], ox, width);
     ox += theme->taskbar.space_gap;
 }
 
@@ -173,14 +160,8 @@ get_text_dimensions(Imlib_Font font, const char *text, int *w, int *h) {
 
 static void
 draw_text(
-    Imlib_Font font,
-    uint align,
-    int ox,
-    int width,
-    int offx,
-    int offy,
-    const char *text,
-    struct color *c) {
+    Imlib_Font font, uint align, int ox, int width, int offx, int offy,
+    const char *text, struct color *c) {
     if (!font)
         return;
 
@@ -285,13 +266,9 @@ render_switcher(struct desktop *desktops) {
     rimgw = get_image_width(theme->switcher.right_img[state]);
     ox += limgw;
     draw_text(
-        theme->switcher.font,
-        theme->switcher.text_align,
-        ox,
-        iter->width - limgw - rimgw,
-        theme->switcher.text_offset_x,
-        theme->switcher.text_offset_y,
-        iter->name,
+        theme->switcher.font, theme->switcher.text_align, ox,
+        iter->width - limgw - rimgw, theme->switcher.text_offset_x,
+        theme->switcher.text_offset_y, iter->name,
         &theme->switcher.text_color[state]);
     ox += iter->width - limgw;
 
@@ -309,13 +286,9 @@ render_switcher(struct desktop *desktops) {
         draw_switcher_middle(state, ox, iter->width);
         ox += limgw;
         draw_text(
-            theme->switcher.font,
-            theme->switcher.text_align,
-            ox,
-            iter->width - limgw - rimgw,
-            theme->switcher.text_offset_x,
-            theme->switcher.text_offset_y,
-            iter->name,
+            theme->switcher.font, theme->switcher.text_align, ox,
+            iter->width - limgw - rimgw, theme->switcher.text_offset_x,
+            theme->switcher.text_offset_y, iter->name,
             &theme->switcher.text_color[state]);
         ox += iter->width - limgw;
         iter = iter->next;
@@ -330,13 +303,9 @@ render_switcher(struct desktop *desktops) {
     draw_switcher_right_corner(state, ox, iter->width);
     ox += limgw;
     draw_text(
-        theme->switcher.font,
-        theme->switcher.text_align,
-        ox,
-        iter->width - limgw - rimgw,
-        theme->switcher.text_offset_x,
-        theme->switcher.text_offset_y,
-        iter->name,
+        theme->switcher.font, theme->switcher.text_align, ox,
+        iter->width - limgw - rimgw, theme->switcher.text_offset_x,
+        theme->switcher.text_offset_y, iter->name,
         &theme->switcher.text_color[state]);
 }
 
@@ -438,15 +407,7 @@ render_taskbar(struct task *tasks, struct desktop *desktops) {
                 imlib_context_set_image(bb);
                 imlib_context_set_blend(1);
                 imlib_blend_image_onto_image(
-                    t->icon,
-                    1,
-                    0,
-                    0,
-                    srcw,
-                    srch,
-                    x,
-                    y,
-                    theme->taskbar.icon_w,
+                    t->icon, 1, 0, 0, srcw, srch, x, y, theme->taskbar.icon_w,
                     theme->taskbar.icon_h);
                 imlib_context_set_blend(0);
                 x += theme->taskbar.icon_w;
@@ -456,14 +417,9 @@ render_taskbar(struct task *tasks, struct desktop *desktops) {
             /* draw text */
             imlib_context_set_cliprect(x, 0, w, bbheight);
             draw_text(
-                theme->taskbar.font,
-                theme->taskbar.text_align,
-                x,
-                w,
-                theme->taskbar.text_offset_x,
-                theme->taskbar.text_offset_y,
-                t->name,
-                &theme->taskbar.text_color[state]);
+                theme->taskbar.font, theme->taskbar.text_align, x, w,
+                theme->taskbar.text_offset_x, theme->taskbar.text_offset_y,
+                t->name, &theme->taskbar.text_color[state]);
             imlib_context_set_cliprect(0, 0, bbwidth, bbheight);
 
             /* draw separator if exists */
@@ -572,11 +528,8 @@ init_render(struct xinfo *X, struct panel *P) {
         XRenderPictureAttributes pwin;
         pwin.subwindow_mode = IncludeInferiors;
         rootpic = XRenderCreatePicture(
-            bbdpy,
-            bbwin,
-            XRenderFindVisualFormat(bbdpy, bbvis),
-            CPSubwindowMode,
-            &pwin);
+            bbdpy, bbwin, XRenderFindVisualFormat(bbdpy, bbvis),
+            CPSubwindowMode, &pwin);
     } else
 #endif
         if (*rootpmap) {
@@ -720,19 +673,8 @@ render_present() {
         imlib_render_image_on_drawable(0, 0);
 
         XRenderComposite(
-            bbdpy,
-            PictOpSrc,
-            piccolor,
-            picalpha,
-            rootpic,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            bbwidth,
-            bbheight);
+            bbdpy, PictOpSrc, piccolor, picalpha, rootpic, 0, 0, 0, 0, 0, 0,
+            bbwidth, bbheight);
     } else
 #endif
         if (*rootpmap) {

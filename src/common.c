@@ -132,9 +132,7 @@ del_mem_entry(void *ptr, const char *file, uint line) {
         LOG_WARNING(
             "common: cannot find previously allocated memory entry, "
             "wrong pointer (%p) to xfree or double free [%s:%u]",
-            ptr,
-            file,
-            line);
+            ptr, file, line);
         return;
     }
 
@@ -157,10 +155,7 @@ xmemleaks() {
             "| there are no memory leaks                                 |");
     while (cur) {
         LOG_DEBUG(
-            "| %10p | %10u | %-23s | %-5u |",
-            cur->ptr,
-            cur->size,
-            cur->file,
+            "| %10p | %10u | %-23s | %-5u |", cur->ptr, cur->size, cur->file,
             cur->line);
         cur = cur->next;
     }

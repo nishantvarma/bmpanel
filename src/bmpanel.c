@@ -136,18 +136,8 @@ get_prop_data(Window win, Atom prop, Atom type, int *items) {
     prop_data = 0;
 
     XGetWindowProperty(
-        X.display,
-        win,
-        prop,
-        0,
-        0x7fffffff,
-        False,
-        type,
-        &type_ret,
-        &format_ret,
-        &items_ret,
-        &after_ret,
-        &prop_data);
+        X.display, win, prop, 0, 0x7fffffff, False, type, &type_ret,
+        &format_ret, &items_ret, &after_ret, &prop_data);
     if (items)
         *items = items_ret;
 
@@ -292,14 +282,7 @@ get_window_icon(Window win) {
                 int x = 0, y = 0;
                 uint w = 0, h = 0, d = 0, bw = 0;
                 XGetGeometry(
-                    X.display,
-                    hints->icon_pixmap,
-                    &pix,
-                    &x,
-                    &y,
-                    &w,
-                    &h,
-                    &bw,
+                    X.display, hints->icon_pixmap, &pix, &x, &y, &w, &h, &bw,
                     &d);
 
                 imlib_context_set_drawable(hints->icon_pixmap);
@@ -334,10 +317,8 @@ static char *
 alloc_window_name(Window win) {
     char *ret, *name = 0;
     name = get_prop_data(
-        win,
-        X.atoms[XATOM_NET_WM_VISIBLE_ICON_NAME],
-        X.atoms[XATOM_UTF8_STRING],
-        0);
+        win, X.atoms[XATOM_NET_WM_VISIBLE_ICON_NAME],
+        X.atoms[XATOM_UTF8_STRING], 0);
     if (name)
         goto name_here;
     name = get_prop_data(
@@ -348,9 +329,7 @@ alloc_window_name(Window win) {
     if (name)
         goto name_here;
     name = get_prop_data(
-        win,
-        X.atoms[XATOM_NET_WM_VISIBLE_NAME],
-        X.atoms[XATOM_UTF8_STRING],
+        win, X.atoms[XATOM_NET_WM_VISIBLE_NAME], X.atoms[XATOM_UTF8_STRING],
         0);
     if (name)
         goto name_here;
@@ -386,10 +365,8 @@ find_argb_visual() {
     template.depth = 32;
     template.class = TrueColor;
     xvi = XGetVisualInfo(
-        X.display,
-        VisualScreenMask | VisualDepthMask | VisualClassMask,
-        &template,
-        &nvi);
+        X.display, VisualScreenMask | VisualDepthMask | VisualClassMask,
+        &template, &nvi);
     if (xvi == 0)
         return 0;
 
@@ -469,32 +446,16 @@ create_panel_window(uint placement, int alignment, int h, int w, int hover) {
     P.x = x;
     P.y = y;
     win = XCreateWindow(
-        X.display,
-        X.root,
-        x,
-        y,
-        w,
-        h,
-        0,
-        X.depth,
-        InputOutput,
-        X.visual,
-        X.amask,
-        &X.attrs);
+        X.display, X.root, x, y, w, h, 0, X.depth, InputOutput, X.visual,
+        X.amask, &X.attrs);
 
     XSelectInput(
         X.display, win, ButtonPressMask | ExposureMask | StructureNotifyMask);
 
     /* get our place on desktop */
     XChangeProperty(
-        X.display,
-        win,
-        X.atoms[XATOM_NET_WM_STRUT],
-        XA_CARDINAL,
-        32,
-        PropModeReplace,
-        (uchar *)&strut,
-        4);
+        X.display, win, X.atoms[XATOM_NET_WM_STRUT], XA_CARDINAL, 32,
+        PropModeReplace, (uchar *)&strut, 4);
 
     static const struct {
         int s, e;
@@ -509,38 +470,20 @@ create_panel_window(uint placement, int alignment, int h, int w, int hover) {
     strutp[where[placement].s] = x;
     strutp[where[placement].e] = x + w;
     XChangeProperty(
-        X.display,
-        win,
-        X.atoms[XATOM_NET_WM_STRUT_PARTIAL],
-        XA_CARDINAL,
-        32,
-        PropModeReplace,
-        (uchar *)&strutp,
-        12);
+        X.display, win, X.atoms[XATOM_NET_WM_STRUT_PARTIAL], XA_CARDINAL, 32,
+        PropModeReplace, (uchar *)&strutp, 12);
 
     /* we want to be on all desktops */
     tmp = -1;
     XChangeProperty(
-        X.display,
-        win,
-        X.atoms[XATOM_NET_WM_DESKTOP],
-        XA_CARDINAL,
-        32,
-        PropModeReplace,
-        (uchar *)&tmp,
-        1);
+        X.display, win, X.atoms[XATOM_NET_WM_DESKTOP], XA_CARDINAL, 32,
+        PropModeReplace, (uchar *)&tmp, 1);
 
     /* we're panel! */
     tmp = X.atoms[XATOM_NET_WM_WINDOW_TYPE_DOCK];
     XChangeProperty(
-        X.display,
-        win,
-        X.atoms[XATOM_NET_WM_WINDOW_TYPE],
-        XA_ATOM,
-        32,
-        PropModeReplace,
-        (uchar *)&tmp,
-        1);
+        X.display, win, X.atoms[XATOM_NET_WM_WINDOW_TYPE], XA_ATOM, 32,
+        PropModeReplace, (uchar *)&tmp, 1);
 
     /* place window on it's position */
     XSizeHints size_hints;
@@ -565,13 +508,8 @@ create_panel_window(uint placement, int alignment, int h, int w, int hover) {
     /* set motif decoration hints */
     struct mwmhints mwm = {MWM_HINTS_DECORATIONS, 0, 0, 0, 0};
     XChangeProperty(
-        X.display,
-        win,
-        X.atoms[XATOM_MOTIF_WM_HINTS],
-        X.atoms[XATOM_MOTIF_WM_HINTS],
-        32,
-        PropModeReplace,
-        (uchar *)&mwm,
+        X.display, win, X.atoms[XATOM_MOTIF_WM_HINTS],
+        X.atoms[XATOM_MOTIF_WM_HINTS], 32, PropModeReplace, (uchar *)&mwm,
         sizeof(struct mwmhints) / 4);
 
     /* set classhint */
@@ -600,11 +538,8 @@ create_panel_window(uint placement, int alignment, int h, int w, int hover) {
         cli.data.l[4] = 0;
 
         XSendEvent(
-            X.display,
-            X.root,
-            False,
-            SubstructureNotifyMask | SubstructureRedirectMask,
-            (XEvent *)&cli);
+            X.display, X.root, False,
+            SubstructureNotifyMask | SubstructureRedirectMask, (XEvent *)&cli);
     }
 
     return win;
@@ -665,9 +600,7 @@ rebuild_desktops() {
 
     char *name, *names;
     names = name = get_prop_data(
-        X.root,
-        X.atoms[XATOM_NET_DESKTOP_NAMES],
-        X.atoms[XATOM_UTF8_STRING],
+        X.root, X.atoms[XATOM_NET_DESKTOP_NAMES], X.atoms[XATOM_UTF8_STRING],
         0);
 
     for (i = 0; i < desktopsnum; ++i) {
@@ -716,11 +649,8 @@ switch_desktop(int d) {
     e.data.l[4] = 0;
 
     XSendEvent(
-        X.display,
-        X.root,
-        False,
-        SubstructureNotifyMask | SubstructureRedirectMask,
-        (XEvent *)&e);
+        X.display, X.root, False,
+        SubstructureNotifyMask | SubstructureRedirectMask, (XEvent *)&e);
 }
 
 /**************************************************************************
@@ -742,11 +672,8 @@ activate_task(struct task *t) {
     e.data.l[4] = 0;
 
     XSendEvent(
-        X.display,
-        X.root,
-        False,
-        SubstructureNotifyMask | SubstructureRedirectMask,
-        (XEvent *)&e);
+        X.display, X.root, False,
+        SubstructureNotifyMask | SubstructureRedirectMask, (XEvent *)&e);
 }
 
 static void
@@ -779,8 +706,7 @@ add_task(Window win, uint focused) {
     t->icon = get_window_icon(win);
 
     XSelectInput(
-        X.display,
-        win,
+        X.display, win,
         PropertyChangeMask | FocusChangeMask | StructureNotifyMask);
 
     /* put task in list */
@@ -1150,11 +1076,7 @@ initP(const char *theme) {
     char dirbuf[4096];
     /* first try to find theme in user home dir */
     snprintf(
-        dirbuf,
-        sizeof(dirbuf),
-        "%s%s/%s",
-        getenv("HOME"),
-        HOME_THEME_PATH,
+        dirbuf, sizeof(dirbuf), "%s%s/%s", getenv("HOME"), HOME_THEME_PATH,
         theme);
     P.theme = load_theme(dirbuf);
     if (P.theme)
@@ -1189,10 +1111,7 @@ validation:
                       ? (int)((X.wa_w * P.theme->width) / 100)
                       : P.theme->width;
     P.win = create_panel_window(
-        P.theme->placement,
-        P.theme->alignment,
-        P.theme->height,
-        P.width,
+        P.theme->placement, P.theme->alignment, P.theme->height, P.width,
         P.theme->height_override);
 
 #ifdef WITH_COMPOSITE
