@@ -15,8 +15,8 @@ static void free_imlib_image(Imlib_Image img);
 static uint figure_out_placement(const char *str);
 static uint figure_out_align(const char *str);
 static uint figure_out_width_type(const char *str);
-static int
-parse_key_value(const char *key, const char *value, struct theme *t);
+static int parse_key_value(
+    const char *key, const char *value, struct theme *t);
 static int parse_line(char *line, struct theme *t);
 static void parse_color(struct color *c, const char *value);
 static uchar hex_to_dec(uchar c);

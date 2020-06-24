@@ -82,8 +82,7 @@ log_console_color_callback(int level, const char *msg) {
         {5, '*'} /* DEBUG */
     };
 
-    printf(
-        "\033[1m\033[30m[ \033[3%dm%c%c\033[0m \033[1m\033[30m]\033[0m ",
+    printf("\033[1m\033[30m[ \033[3%dm%c%c\033[0m \033[1m\033[30m]\033[0m ",
         log_console_color_params[level].color,
         log_console_color_params[level].ch,
         log_console_color_params[level].ch);

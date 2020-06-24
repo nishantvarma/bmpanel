@@ -120,7 +120,7 @@ struct theme {
 
 #define THEME_USE_TASKBAR_ICON(t) \
     (is_element_in_theme((t), 'b') && (t)->taskbar.icon_w != 0 && \
-     (t)->taskbar.icon_h != 0)
+        (t)->taskbar.icon_h != 0)
 
 struct theme *load_theme(const char *dir);
 void free_theme(struct theme *t);
