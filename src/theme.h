@@ -21,11 +21,13 @@
 #define WIDTH_TYPE_PIXELS 0
 #define WIDTH_TYPE_PERCENT 1
 
-struct color {
+struct color
+{
     uchar r, g, b;
 };
 
-struct clock_theme {
+struct clock_theme
+{
     Imlib_Image right_img;
     Imlib_Image tile_img;
     Imlib_Image left_img;
@@ -43,7 +45,8 @@ struct clock_theme {
     char *format;
 };
 
-struct taskbar_theme {
+struct taskbar_theme
+{
     Imlib_Image right_img[2];
     Imlib_Image tile_img[2];
     Imlib_Image left_img[2];
@@ -65,7 +68,8 @@ struct taskbar_theme {
     int space_gap;
 };
 
-struct switcher_theme {
+struct switcher_theme
+{
     Imlib_Image left_corner_img[2];
     Imlib_Image right_corner_img[2];
 
@@ -86,7 +90,8 @@ struct switcher_theme {
     int space_gap;
 };
 
-struct theme {
+struct theme
+{
     char *name;
     char *author;
     int version_major;
@@ -120,7 +125,7 @@ struct theme {
 
 #define THEME_USE_TASKBAR_ICON(t) \
     (is_element_in_theme((t), 'b') && (t)->taskbar.icon_w != 0 && \
-        (t)->taskbar.icon_h != 0)
+     (t)->taskbar.icon_h != 0)
 
 struct theme *load_theme(const char *dir);
 void free_theme(struct theme *t);

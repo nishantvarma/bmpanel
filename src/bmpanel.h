@@ -16,7 +16,8 @@
 #include "common.h"
 #include <Imlib2.h>
 
-struct task {
+struct task
+{
     struct task *next;
     char *name;
     Window win;
@@ -28,7 +29,8 @@ struct task {
     uint iconified;
 };
 
-struct desktop {
+struct desktop
+{
     struct desktop *next;
     char *name;
     int posx;
@@ -36,14 +38,16 @@ struct desktop {
     uint focused;
 };
 
-struct tray {
+struct tray
+{
     struct tray *next;
     Window win;
     int x;
     int y;
 };
 
-struct panel {
+struct panel
+{
     Window win;
     struct task *tasks;
     struct desktop *desktops;
@@ -55,7 +59,8 @@ struct panel {
     int y;
 };
 
-enum {
+enum
+{
     XATOM_WM_STATE,
     XATOM_NET_DESKTOP_NAMES,
     XATOM_NET_WM_STATE,
@@ -86,7 +91,8 @@ enum {
     XATOM_COUNT
 };
 
-struct xinfo {
+struct xinfo
+{
     Display *display;
     int screen;
     int screen_width;

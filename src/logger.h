@@ -46,7 +46,9 @@ void log_file_callback(int, const char *);
 #define LOG_ASSERT(what) \
     ((what) ? ((void)0) \
             : LOG_WARNING( \
-                  "assertion failed: " #what " (%s:%d)", __FILE__, __LINE__))
+                  "assertion failed: " #what " (%s:%d)", \
+                  __FILE__, \
+                  __LINE__))
 #else
 #define LOG_ASSERT(nothing) ((void)0)
 #endif
