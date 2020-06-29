@@ -1,0 +1,17 @@
+# Files
+
+src/bmpanel.c
+src/render.c
+
+# Folders
+
+./
+
+# Functions
+
+src/bmpanel.c:/^main/
+src/bmpanel.c:/^initX/
+src/bmpanel.c:/^initP/
+src/bmpanel.c:/^create_panel_window/
+
+src/render.c:/^init_render/

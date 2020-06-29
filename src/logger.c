@@ -23,12 +23,15 @@ static int file_callback_initialized = 0;
 static void send_to_all(int level, const char *msg);
 
 void
-log_msg(int level, const char *msg, ...) {
-    if (log_callbacks_count) {
+log_msg(int level, const char *msg, ...)
+{
+    if (log_callbacks_count)
+    {
         char buf[BUFFER_SIZE];
         va_list vl;
 
-        if (log_verbosity & verbosity_map[level]) {
+        if (log_verbosity & verbosity_map[level])
+        {
             va_start(vl, msg);
             vsnprintf(buf, sizeof(char) * BUFFER_SIZE, msg, vl);
             va_end(vl);
@@ -42,15 +45,18 @@ log_msg(int level, const char *msg, ...) {
 }
 
 void
-log_attach_callback(void (*callback)(int, const char *)) {
-    if (log_callbacks_count < MAX_CALLBACKS) {
+log_attach_callback(void (*callback)(int, const char *))
+{
+    if (log_callbacks_count < MAX_CALLBACKS)
+    {
         log_callbacks[log_callbacks_count] = callback;
         log_callbacks_count++;
     }
 }
 
 void
-log_clear_callbacks() {
+log_clear_callbacks()
+{
     int i;
 
     for (i = 0; i < log_callbacks_count; ++i)
@@ -60,18 +66,22 @@ log_clear_callbacks() {
 }
 
 void
-log_set_verbosity(int level) {
+log_set_verbosity(int level)
+{
     log_verbosity = level;
 }
 
 void
-log_console_callback(int level, const char *msg) {
+log_console_callback(int level, const char *msg)
+{
     printf("%s\n", msg);
 }
 
 void
-log_console_color_callback(int level, const char *msg) {
-    static const struct {
+log_console_color_callback(int level, const char *msg)
+{
+    static const struct
+    {
         int color;
         char ch;
     } log_console_color_params[] = {
@@ -82,7 +92,8 @@ log_console_color_callback(int level, const char *msg) {
         {5, '*'} /* DEBUG */
     };
 
-    printf("\033[1m\033[30m[ \033[3%dm%c%c\033[0m \033[1m\033[30m]\033[0m ",
+    printf(
+        "\033[1m\033[30m[ \033[3%dm%c%c\033[0m \033[1m\033[30m]\033[0m ",
         log_console_color_params[level].color,
         log_console_color_params[level].ch,
         log_console_color_params[level].ch);
@@ -90,18 +101,21 @@ log_console_color_callback(int level, const char *msg) {
 }
 
 void
-log_file_callback(int level, const char *msg) {
+log_file_callback(int level, const char *msg)
+{
     char buftime[256];
     FILE *f;
     time_t current_time;
 
-    static const char *log_file_params[] = {
-        "[EE]", "[WW]", "[MM]", "[II]", "[DB]"};
+    static const char *log_file_params[] =
+        {"[EE]", "[WW]", "[MM]", "[II]", "[DB]"};
 
-    if (!file_callback_initialized) {
+    if (!file_callback_initialized)
+    {
         f = fopen(LOG_FILENAME, "w");
         file_callback_initialized = 1;
-    } else
+    }
+    else
         f = fopen(LOG_FILENAME, "a");
 
     if (!f)
@@ -114,7 +128,8 @@ log_file_callback(int level, const char *msg) {
 }
 
 static void
-send_to_all(int level, const char *msg) {
+send_to_all(int level, const char *msg)
+{
     int i;
 
     for (i = 0; i < log_callbacks_count; ++i)

@@ -15,7 +15,8 @@ static int memleaks;
 **************************************************************************/
 
 void *
-impl__xmalloc(size_t size) {
+impl__xmalloc(size_t size)
+{
     void *ret = malloc(size);
     if (!ret)
         LOG_ERROR("common: out of memory, malloc failed >:-O");
@@ -25,27 +26,31 @@ impl__xmalloc(size_t size) {
 }
 
 void *
-impl__xmallocz(size_t size) {
+impl__xmallocz(size_t size)
+{
     void *ret = impl__xmalloc(size);
     memset(ret, 0, size);
     return ret;
 }
 
 void
-impl__xfree(void *ptr) {
+impl__xfree(void *ptr)
+{
     free(ptr);
     memleaks--;
 }
 
 char *
-impl__xstrdup(const char *str) {
+impl__xstrdup(const char *str)
+{
     size_t strl = strlen(str);
     char *ret = impl__xmalloc(strl + 1);
     return strcpy(ret, str);
 }
 
 void
-xmemleaks() {
+xmemleaks()
+{
     LOG_DEBUG("common: memory leaks = %d", memleaks);
 }
 
@@ -56,7 +61,8 @@ xmemleaks() {
 
 /* TODO: deal with low deletion performance? O(N) really bad? */
 
-struct mem_entry {
+struct mem_entry
+{
     void *ptr;
     size_t size;
     const char *file;
@@ -69,7 +75,8 @@ static void add_mem_entry(void *ptr, size_t size, const char *file, uint line);
 static void del_mem_entry(void *ptr, const char *file, uint line);
 
 void *
-impl__xmalloc(size_t size, const char *file, uint line) {
+impl__xmalloc(size_t size, const char *file, uint line)
+{
     void *ret = malloc(size);
     if (!ret)
         LOG_ERROR("common: out of memory, malloc failed >:-O");
@@ -80,58 +87,71 @@ impl__xmalloc(size_t size, const char *file, uint line) {
 }
 
 void *
-impl__xmallocz(size_t size, const char *file, uint line) {
+impl__xmallocz(size_t size, const char *file, uint line)
+{
     void *ret = impl__xmalloc(size, file, line);
     memset(ret, 0, size);
     return ret;
 }
 
 void
-impl__xfree(void *ptr, const char *file, uint line) {
+impl__xfree(void *ptr, const char *file, uint line)
+{
     del_mem_entry(ptr, file, line);
     free(ptr);
     memleaks--;
 }
 
 char *
-impl__xstrdup(const char *str, const char *file, uint line) {
+impl__xstrdup(const char *str, const char *file, uint line)
+{
     size_t strl = strlen(str);
     char *ret = impl__xmalloc(strl + 1, file, line);
     return strcpy(ret, str);
 }
 
 static void
-add_mem_entry(void *ptr, size_t size, const char *file, uint line) {
+add_mem_entry(void *ptr, size_t size, const char *file, uint line)
+{
     struct mem_entry *e = malloc(sizeof(struct mem_entry));
     e->ptr = ptr;
     e->size = size;
     e->file = file;
     e->line = line;
 
-    if (!entries) {
+    if (!entries)
+    {
         entries = e;
         e->next = 0;
-    } else {
+    }
+    else
+    {
         e->next = entries;
         entries = e;
     }
 }
 
 static void
-del_mem_entry(void *ptr, const char *file, uint line) {
+del_mem_entry(void *ptr, const char *file, uint line)
+{
     struct mem_entry *prev, *current;
     prev = current = entries;
-    while (current) {
+    while (current)
+    {
         if (current->ptr == ptr)
             break;
         prev = current;
         current = current->next;
     }
 
-    if (!current) {
-        LOG_WARNING("common: cannot find previously allocated memory entry, "
-                    "wrong pointer (%p) to xfree or double free [%s:%u]",
-            ptr, file, line);
+    if (!current)
+    {
+        LOG_WARNING(
+            "common: cannot find previously allocated memory entry, "
+            "wrong pointer (%p) to xfree or double free [%s:%u]",
+            ptr,
+            file,
+            line);
         return;
     }
 
@@ -143,7 +163,8 @@ del_mem_entry(void *ptr, const char *file, uint line) {
 }
 
 void
-xmemleaks() {
+xmemleaks()
+{
     LOG_DEBUG("common: dumping memory leaks (count: %u) table...", memleaks);
     LOG_DEBUG("+------------+------------+-------------------------+-------+");
     LOG_DEBUG("|     ptr    |    size    |           file          | line  |");
@@ -152,9 +173,14 @@ xmemleaks() {
     if (!cur)
         LOG_DEBUG(
             "| there are no memory leaks                                 |");
-    while (cur) {
-        LOG_DEBUG("| %10p | %10u | %-23s | %-5u |", cur->ptr, cur->size,
-            cur->file, cur->line);
+    while (cur)
+    {
+        LOG_DEBUG(
+            "| %10p | %10u | %-23s | %-5u |",
+            cur->ptr,
+            cur->size,
+            cur->file,
+            cur->line);
         cur = cur->next;
     }
     LOG_DEBUG("+------------+------------+-------------------------+-------+");
